@@ -1,0 +1,30 @@
+version: '3.3'
+
+networks:
+  proxy:
+    external:
+      name: proxy
+
+configs:
+  traefik_toml:
+    file: ./traefik-nossl.toml
+
+services:
+  traefik:
+    image: traefik:latest
+    deploy:
+      placement:
+        constraints:
+        - node.role == manager
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - proxy
+    ports:
+      - "80:80"
+      - "8080:8080"
+    configs:
+      - source: traefik_toml
+        target: /etc/traefik/traefik.toml
+        mode: 444
+
